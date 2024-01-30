@@ -43,12 +43,4 @@ function Spacekraft(name, fuelType) {
   };
 }
 
-const abobaAirlines = new Spacekraft("Aboba Airlines", "Diesel");
-console.log(abobaAirlines.land("Donbass"));
-console.log(abobaAirlines.launch());
-console.log(abobaAirlines.land("Donbass"));
-console.log(abobaAirlines.checkFuel());
-console.log(abobaAirlines.land("mars"));
-console.log(abobaAirlines.checkFuel());
-console.log(abobaAirlines.refuel(10));
-console.log(abobaAirlines.refuel(200));
+module.exports = Spacekraft;
