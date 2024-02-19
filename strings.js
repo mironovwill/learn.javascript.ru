@@ -1,6 +1,5 @@
 //Напишите функцию ucFirst(str), возвращающую строку str с заглавным первым символом.
 const ucFirst = str => str.charAt(0).toUpperCase() + str.slice(1);
-
 //Напишите функцию checkSpam(str), возвращающую true, если str содержит 'viagra' или 'XXX', а иначе false.
 
 const checkSpam = str =>
