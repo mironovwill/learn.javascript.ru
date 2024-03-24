@@ -15,11 +15,11 @@
 const object = {};
 
 function A() {
-  return object;
+    return object;
 }
-
+ 
 function B() {
-  return object;
+    return object;
 }
 
 let a = new A();
@@ -43,18 +43,18 @@ alert( "Mul=" + calculator.mul() );
 */
 
 function Calculator() {
-  this.read = function () {
-    this.a = +prompt("Ведите первое число", 0);
-    this.b = +prompt("Ведите второе число", 0);
-  };
+    this.read = function () {
+        this.a = +prompt("Ведите первое число", 0);
+        this.b = +prompt("Ведите второе число", 0);
+    };
 
-  this.sum = function () {
-    return this.a + this.b;
-  };
+    this.sum = function () {
+        return this.a + this.b;
+    };
 
-  this.mul = function () {
-    return this.a * this.b;
-  };
+    this.mul = function () {
+        return this.a * this.b;
+    };
 }
 
 const newCalc = Calculator();
@@ -83,10 +83,10 @@ alert(accumulator.value); // выведет сумму этих значений
 */
 
 function Accumulator(startingValue) {
-  this.value = startingValue;
-  this.read = function () {
-    this.value += +prompt("Сколько добавить?", 0);
-  };
+    this.value = startingValue;
+    this.read = function () {
+        this.value += +prompt("Сколько добавить?", 0);
+    };
 }
 
 const acc = Accumulator(0);
