@@ -1,89 +1,93 @@
+const MESSAGES = {
+  powerChangeSuccess: "Power successfully changed",
+  powerChangeError: "Power should be between 1 and 10!",
+  breadInsertSuccess: "Bread successfully insert!",
+  breadInsertError: "Bread already inside!",
+  breadEjectSuccess: "Bread successfully ejected!",
+  breadEjectError: "Bread not inside!",
+  timeError: "Time should be between 90 and 1",
+  timeBreadError: "Bread should be inside before start!",
+  successToast: "Done!",
+};
+
 class Toaster {
-  constructor() {
-    this.power = 5;
-    this.bread = false;
-    this.warmTime = 0;
-    this.status = false;
-    this.totalTime = setInterval(() => this.warmTime-- * 1000, this.warmTime);
-  }
+  #power = 5;
+  #totalPowerUse = 0;
+  #currentPowerUse = 0;
+  #breadInside = false;
+  #initTime = 0;
+  #timeLeft = 0;
+  #timerId;
 
-  toggleToasterStatus() {
-    this.status = !this.status;
-
-    if (this.status) {
-      console.log("Тостер включен");
+  setPower(power) {
+    if (power > 1 && power < 10) {
+      this.#power = power;
+      return MESSAGES.powerChangeSuccess;
     } else {
-      console.log("Тостер выключен");
+      return MESSAGES.powerChangeError;
     }
   }
 
   insertBread() {
-    if (this.bread) {
-      console.log("Хлеб уже в тостере");
+    if (!this.#breadInside) {
+      this.#breadInside = true;
+      this.#currentPowerUse = 0;
+      return MESSAGES.breadInsertSuccess;
     } else {
-      this.bread = true;
-      console.log("Хлеб успешно вставлен в тостер");
+      return MESSAGES.breadInsertError;
     }
   }
 
   ejectBread() {
-    if (this.bread) {
-      this.bread = false;
-      console.log("Хлеб успешно вынут из тостера");
+    if (!this.#breadInside) {
+      this.#breadInside = false;
+      this.#currentPowerUse = 0;
+      return MESSAGES.breadEjectSuccess;
     } else {
-      console.log("Хлеба нет в тостере");
+      return MESSAGES.breadEjectError;
     }
   }
 
-  setPower(numberOfPower) {
-    if (numberOfPower < 1 || numberOfPower > 10)
-      console.log("Мощность должна быть от 1 до 10");
+  setTimeLeft(time) {
+    if (time < 1 || time > 90) return MESSAGES.timeError;
+    if (!this.#breadInside) return MESSAGES.timeBreadError;
 
-    this.power = numberOfPower;
-    console.log(`Мощность установлена на значении ${this.power}`);
+    clearInterval(this.#timerId);
+    this.#initTime = time;
+    this.#timeLeft = time;
+    this.#timerId = setInterval(() => {
+      if (this.#timeLeft === 0) {
+        clearInterval(this.#timerId);
+        this.ejectBread();
+        return MESSAGES.successToast;
+      } else {
+        this.#totalPowerUse = this.#power;
+        this.#currentPowerUse = this.#power;
+        this.#timeLeft--;
+        return `Time left: ${this.#timeLeft}`;
+      }
+    }, time * 100);
   }
 
   logStat() {
-    const stats = {
-      Мощность: this.power,
-      "Хлеб внутри": this.bread,
-      "Время нагрева": this.warmTime,
-      Включен: this.status,
-    };
-
-    console.table(stats);
-    console.log(`Время работы: ${this.totalTime}`);
+    console.log(`
+      Toaster info: 
+      Power: ${this.#power}
+      LoadingTime: ${this.#initTime} 
+      Loading: ${!!this.#timerId}
+      LoadingLeft: ${this.#timeLeft} 
+      BreadInside: ${this.#breadInside}
+      Current power use: ${this.#currentPowerUse}
+    `);
   }
 
-  setTimeLeft(timeOfWarm) {
-    if (timeOfWarm < 0 || timeOfWarm > 10) {
-      return console.log("Время нагрева должно быть от 0 до 10");
-    } else {
-      this.warmTime = timeOfWarm;
-      console.log(`Время нагрева установлено на значении ${this.warmTime}`);
-    }
-
-    if (!this.bread) return console.log("Хлеба нет в тостере");
-
-    this.toggleToasterStatus();
-
-    setTimeout(() => {
-      this.ejectBread();
-      this.toggleToasterStatus();
-    }, this.warmTime * 1000);
+  logPower() {
+    console.log(`
+      Power info: 
+      Total power use: ${this.#totalPowerUse}
+      Current power use: ${this.#currentPowerUse}
+    `);
   }
 }
 
 const toaster = new Toaster();
-
-toaster.insertBread();
-toaster.insertBread();
-toaster.ejectBread();
-toaster.ejectBread();
-toaster.setPower(10);
-console.log("--------");
-toaster.setTimeLeft(5);
-console.log("--------");
-toaster.insertBread();
-toaster.setTimeLeft(90);
-toaster.logStat();
