@@ -1,11 +1,10 @@
-Array.prototype.copy = function (count) {
-    if (count < 0) return []
-    return Array(count).fill(this).flat()
+function getNumbersByParity(data, parity) {
+  return data.filter(num =>
+    parity === "even" ? num % 2 === 0 : num % 2 !== 0
+  );
 }
 
-console.log([1, 2, 3].copy(2)) // [1,2,3,1,2,3]
-console.log([4].copy(3)) // [4,4,4]
-console.log([1, 2, 3].copy(1)) // [1,2,3]
-console.log([1, 2, 3].copy(-1)) // []
-console.log([1, 2, 3].copy(0)) // []
-console.log([1, 2, 3].copy()) //[1,2,3]
+const data = [1, 2, 3, 4, 5, 6];
+
+console.log(getNumbersByParity(data, "even")); // [2, 4, 6];
+console.log(getNumbersByParity(data, "odd")); // [1, 3, 5];
