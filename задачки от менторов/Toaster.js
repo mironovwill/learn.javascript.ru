@@ -4,38 +4,37 @@ const MESSAGES = {
   breadInsertSuccess: "Bread successfully insert!",
   breadInsertError: "Bread already inside!",
   breadEjectSuccess: "Bread successfully ejected!",
-  breadEjectError: "Bread not inside!",
+  breadEjectError: "Bread is not inside!",
   timeError: "Time should be between 90 and 1",
-  timeBreadError: "Bread should be inside before start!",
   successToast: "Done!",
   loading: "Loading in process!",
 };
 
 class Toaster {
   #power = 5;
-  #totalPowerUse = 0;
-  #currentPowerUse = 0;
   #breadInside = false;
   #initTime = 0;
-  #timeLeft = 0;
-  #timerId = null;
+  #endTime = 0;
+  #loadingTime = 0;
+  #timerID = null;
+  #totalPowerUse = 0;
+  #currentPowerUse = 0;
 
   setTimeLeft = time => {
-    if (time < 1 || time > 90) return MESSAGES.timeError;
-    if (!this.#breadInside) return MESSAGES.timeBreadError;
+    if (time < 0 || time > 90) throw new Error(MESSAGES.timeError);
 
-    clearInterval(this.#timerId);
-
+    clearInterval(this.#timerID);
+    this.#loadingTime = time;
     this.#initTime = new Date();
-    this.#timeLeft = this.#initTime.setSeconds(
+    this.#endTime = this.#initTime.setSeconds(
       this.#initTime.getSeconds() + time
     );
 
     const timer = () => {
-      const currentTime = new Date();
+      const currentTime = new Date().getTime();
 
-      if (currentTime >= this.#timeLeft) {
-        clearInterval(this.#timerId);
+      if (currentTime >= this.#endTime) {
+        clearInterval(this.#timerID);
         console.log(MESSAGES.successToast);
         this.ejectBread();
       } else {
@@ -45,45 +44,42 @@ class Toaster {
       }
     };
 
-    this.#timerId = setInterval(timer, 1000);
+    this.#timerID = setInterval(timer, 1000);
   };
 
   setPower = power => {
-    if (power > 1 && power < 10) {
-      this.#power = power;
-      console.log(MESSAGES.powerChangeSuccess);
-    } else {
-      console.log(MESSAGES.powerChangeError);
-    }
+    if (power < 1 || power > 10) throw new Error(MESSAGES.powerChangeError);
+
+    this.#power = power;
+    return MESSAGES.powerChangeSuccess;
   };
 
   insertBread = () => {
-    if (!this.#breadInside) {
-      this.#breadInside = true;
-      this.#currentPowerUse = 0;
-      console.log(MESSAGES.breadInsertSuccess);
-    } else {
-      console.log(MESSAGES.breadInsertError);
-    }
+    if (this.#breadInside) throw new Error(MESSAGES.breadInsertError);
+    this.#currentPowerUse = 0;
+    this.#breadInside = true;
+
+    return MESSAGES.breadInsertSuccess;
   };
 
   ejectBread = () => {
     if (this.#breadInside) {
       this.#breadInside = false;
       this.#currentPowerUse = 0;
-      console.log(MESSAGES.breadEjectSuccess);
-    } else {
-      console.log(MESSAGES.breadEjectError);
+
+      return MESSAGES.breadEjectSuccess;
     }
+
+    throw new Error(MESSAGES.breadEjectError);
   };
 
   logStat = () => {
     console.log(`
       Toaster info: 
       Power: ${this.#power}
-      LoadingTime: ${this.#initTime} 
-      Loading: ${!!this.#timerId}
-      LoadingLeft: ${this.#timeLeft} 
+      LoadingTime: ${this.#loadingTime} 
+      Loading: ${!!this.#timerID}
+      LoadingLeft: ${(this.#endTime - new Date().getTime()) / 1000} 
       BreadInside: ${this.#breadInside}
       Current power use: ${this.#currentPowerUse}
     `);
@@ -97,14 +93,3 @@ class Toaster {
     `);
   };
 }
-
-const toaster = new Toaster();
-
-toaster.insertBread();
-toaster.logPower();
-toaster.setTimeLeft(10);
-setTimeout(() => {
-  toaster.setTimeLeft(20);
-  toaster.logPower();
-  toaster.logStat();
-}, 5000);
